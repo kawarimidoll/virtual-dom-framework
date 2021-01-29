@@ -12,9 +12,10 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitAny": false,
-    "noImplicitThis": false,
-    "strictNullChecks": false
+    "noImplicitAny": true,
+    "noExplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true
   },
   "include": ["src/**/*", "__tests__/**/*"]
 }

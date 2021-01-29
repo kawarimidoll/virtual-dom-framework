@@ -2,14 +2,14 @@ import { View, VNode, updateElement, createElement, isEmptyNode } from "./view";
 import { ActionTree } from "./action";
 
 interface AppConstructor<State, Actions extends ActionTree<State>> {
-  el: Element | string;
+  el: HTMLElement | string;
   view: View<State, Actions>;
   state: State;
   actions: Actions;
 }
 
 export class App<State, Actions extends ActionTree<State>> {
-  private readonly el: Element;
+  private readonly el: HTMLElement;
   private readonly view: AppConstructor<State, Actions>["view"];
   private readonly state: AppConstructor<State, Actions>["state"];
   private readonly actions: AppConstructor<State, Actions>["actions"];
@@ -19,10 +19,15 @@ export class App<State, Actions extends ActionTree<State>> {
   private skipRender!: boolean;
 
   constructor(params: AppConstructor<State, Actions>) {
-    this.el =
-      typeof params.el === "string"
-        ? document.querySelector(params.el)
-        : params.el;
+    if (typeof params.el === "string") {
+      const el = document.querySelector<HTMLElement>(params.el);
+      if (el == null) {
+        throw new Error("target element not found");
+      }
+      this.el = el;
+    } else {
+      this.el = params.el;
+    }
     this.view = params.view;
     this.state = params.state;
     this.actions = this.dispatchAction(params.actions);
@@ -30,9 +35,12 @@ export class App<State, Actions extends ActionTree<State>> {
   }
 
   private dispatchAction(actions: Actions): Actions {
-    return Object.keys(actions).reduce((dispatched, key) => {
-      dispatched[key] = (state: State, ...data: any): any => {
-        const ret = actions[key](state, ...data);
+    return Object.entries(actions).reduce((dispatched, [key, action]) => {
+      dispatched[key] = (
+        state: State,
+        ...data: any
+      ): ReturnType<typeof action> => {
+        const ret = action(state, ...data);
         this.resolveNode();
         return ret;
       };
@@ -56,7 +64,7 @@ export class App<State, Actions extends ActionTree<State>> {
     if (isEmptyNode(this.oldNode)) {
       this.el.appendChild(createElement(this.newNode));
     } else {
-      updateElement(this.el as HTMLElement, this.oldNode, this.newNode);
+      updateElement(this.el, this.oldNode, this.newNode);
     }
 
     this.oldNode = this.newNode;
