@@ -6,19 +6,15 @@
   "author": "kawarimidoll <kawarimidoll+git@gmail.com>",
   "license": "MIT",
   "lint-staged": {
-    "*.{js,jsx,vue,ts,tsx}": "eslint",
-    "*.{json,md,yml}": "prettier --write"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "*.{js,ts}": "eslint",
+    "*.{js,ts,json,md,html,yml}": "prettier --write"
   },
   "scripts": {
     "build": "webpack",
     "ci": "yarn install --frozen-lockfile",
     "lint": "eslint .",
-    "preci": "rimraf node_modules"
+    "preci": "rimraf node_modules",
+    "postinstall": "husky install"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.15.2",
